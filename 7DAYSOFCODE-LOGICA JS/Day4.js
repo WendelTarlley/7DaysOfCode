@@ -2,7 +2,7 @@ const numTentativas = 3
 let tentativaAtual = 0
 const minimo = 0;
 const maximo = 10;
-const numero = Math.floor(Math.random()* maximo)
+const numero = Math.floor(Math.random()* maximo).toString()
 
 console.log(numero)
 
