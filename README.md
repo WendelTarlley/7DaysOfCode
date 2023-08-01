@@ -6,6 +6,7 @@ Repositório para que eu possa treinar e aprender novas tecnologias com os desaf
     - ## Day2: Variáveis
     - ## Day3: Fluxo de decisão
     - ## Day4: Mais loops e randomização
+    - ## Day5: Arrays e coleções
 
 
 - ## #7DaysOfCode JavaScript
