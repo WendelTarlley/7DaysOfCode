@@ -4,6 +4,8 @@ Repositório para que eu possa treinar e aprender novas tecnologias com os desaf
 - ## #7DaysOfCode Lógica JS
     - ## Day1: Operações Booleanas
     - ## Day2: Variáveis
+    - ## Day3: Fluxo de decisão
+    - ## Day4: Mais loops e randomização
 
 
 - ## #7DaysOfCode JavaScript
