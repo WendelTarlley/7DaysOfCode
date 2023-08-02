@@ -8,7 +8,7 @@ Repositório para que eu possa treinar e aprender novas tecnologias com os desaf
     - ## Day4: Mais loops e randomização
     - ## Day5: Arrays e coleções
     - ## Day6: Remoção de Arrays
-
+    - ## DAY7: Funções em Javascript
 
 - ## #7DaysOfCode JavaScript
     - ## Day1: Criando Filmes de forma estática
