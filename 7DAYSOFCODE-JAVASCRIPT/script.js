@@ -1,22 +1,24 @@
 class filme{
-    constructor(nome,imagem,nota,favorito,descricao){
-        this.nome = nome;
-        this.imagem = imagem;
-        this.nota = nota;
-        this.favorito = favorito;
-        this.descricao = descricao;
+    constructor(adult,backdrop_path,genre_ids,id,original_language,original_title,overview,popularity,poster_path,release_date,title,vote_avarage,vote_count){
+      this.adult = adult;
+      this.backdrop_path = backdrop_path;
+      this.genre_ids = genre_ids;
+      this.id = id;
+      this.original_language = original_language;
+      this.original_title = original_title;
+      this.overview = overview;
+      this.popularity = popularity;
+      this.poster_path = poster_path;
+      this.release_date = release_date;
+      this.title = title
+      this.vote_avarage = vote_avarage;
+      this.vote_count = vote_count
     }
 
 }
 
-const filme1 = new filme("filme1","https://mundoconectado.com.br/uploads/chamadas/capa_145.jpg",
-9.5,true, "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.")
-
-const filme2 = new filme("filme1","https://mundoconectado.com.br/uploads/chamadas/capa_145.jpg",
-9.5,false, "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.")
-
-let filmes = [filme1,filme2];
-showContent(filmes)
+let filmes = [];
+getMostPopularFilmes()
 
 function showContent(lista){
     
@@ -28,13 +30,13 @@ function showContent(lista){
         
         let div = clone.getElementById("geral")
         let img = clone.getElementById("imagem-filme")
-        img.src = lista[index].imagem
+        img.src = "https://image.tmdb.org/t/p/w500" + lista[index].poster_path
         let filmName = clone.getElementById("nome-filme")
-        filmName.textContent = lista[index].nome
+        filmName.textContent = lista[index].title
         let filmDescription = clone.getElementById("descricao-filme")
-        filmDescription.textContent = lista[index].descricao
+        filmDescription.textContent = lista[index].overview
         let nota = clone.getElementById("nota")
-        nota.textContent = lista[index].nota
+        nota.textContent = lista[index].vote_average
 
         let elementFavorito = clone.getElementById("div-favorito")
         if(lista[index].favorito){
@@ -69,7 +71,7 @@ inputPesquisa.addEventListener('input', function () {
     if(this.value === "" || this.value === null){
         showContent(filmes)
     }else{
-        filmesFiltrados = filmes.filter((filme) => filme.nome.includes(this.value) )
+        filmesFiltrados = filmes.filter((filme) => filme.title.toLowerCase().includes(this.value.toLowerCase()) )
         showContent(filmesFiltrados)
     }
 
@@ -79,4 +81,22 @@ function clearElement(element) {
     while (element.hasChildNodes()) {
         element.removeChild(element.firstChild)
     }
+}
+
+async function getMostPopularFilmes() {
+
+    const options = {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyNTk1MDM5ZmE2MzcxYmQzMDBmMzFlOTE5ZTkxYTJiNCIsInN1YiI6IjY0Y2E3NDBjMDAxYmJkMDEwNzk5ZWZlYyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.JZ5FaLaqoWZ5t9_0DQcnQpYaje8synfIsJnYfJFIkaE'
+        }
+      };
+   await fetch('https://api.themoviedb.org/3/movie/popular?language=en-US&page=1', options)
+    .then(response => response.json())
+    .then(response => {
+        showContent(response.results)
+        filmes = response.results
+    })
+    .catch(err => console.error(err));
 }

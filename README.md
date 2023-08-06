@@ -13,3 +13,4 @@ Repositório para que eu possa treinar e aprender novas tecnologias com os desaf
 - ## #7DaysOfCode JavaScript
     - ## Day1: Criando Filmes de forma estática
     - ## Day2: Manipulação do DOM e criando os elementos de forma dinâmica
+    - ## Day3:  Consumindo a API
