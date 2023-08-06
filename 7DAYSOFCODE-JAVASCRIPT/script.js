@@ -1,102 +1,123 @@
-class filme{
-    constructor(adult,backdrop_path,genre_ids,id,original_language,original_title,overview,popularity,poster_path,release_date,title,vote_avarage,vote_count){
-      this.adult = adult;
-      this.backdrop_path = backdrop_path;
-      this.genre_ids = genre_ids;
-      this.id = id;
-      this.original_language = original_language;
-      this.original_title = original_title;
-      this.overview = overview;
-      this.popularity = popularity;
-      this.poster_path = poster_path;
-      this.release_date = release_date;
-      this.title = title
-      this.vote_avarage = vote_avarage;
-      this.vote_count = vote_count
+class Filme {
+    constructor(data) {
+      this.adult = data.adult;
+      this.backdrop_path = data.backdrop_path;
+      this.genre_ids = data.genre_ids;
+      this.id = data.id;
+      this.original_language = data.original_language;
+      this.original_title = data.original_title;
+      this.overview = data.overview;
+      this.popularity = data.popularity;
+      this.poster_path = data.poster_path;
+      this.release_date = data.release_date;
+      this.title = data.title;
+      this.vote_average = data.vote_avarage; // Fixed typo: vote_avarage -> vote_average
+      this.vote_count = data.vote_count;
+      this.favorito = false; // Default value for the 'favorito' property
     }
-
+  }
+  
+  let filmes = [];
+  
+  async function getApiKey() {
+    const response = await fetch("apikey.txt");
+    return await response.text();
 }
-
-let filmes = [];
-getMostPopularFilmes()
-
-function showContent(lista){
-    
-    
-    let temp;
-    temp = document.getElementsByTagName("template")[0]
-    for (let index = 0; index < lista.length; index++) {
-        let clone = temp.content.cloneNode(true)
-        
-        let div = clone.getElementById("geral")
-        let img = clone.getElementById("imagem-filme")
-        img.src = "https://image.tmdb.org/t/p/w500" + lista[index].poster_path
-        let filmName = clone.getElementById("nome-filme")
-        filmName.textContent = lista[index].title
-        let filmDescription = clone.getElementById("descricao-filme")
-        filmDescription.textContent = lista[index].overview
-        let nota = clone.getElementById("nota")
-        nota.textContent = lista[index].vote_average
-
-        let elementFavorito = clone.getElementById("div-favorito")
-        if(lista[index].favorito){
-            elementFavorito.classList.add("fa-heart")
-            elementFavorito.classList.add("fa")            
-        }else{
-            elementFavorito.classList.add("fa-heart-o")
-            elementFavorito.classList.add("fa")
-        }
-        document.getElementById('card-template').appendChild(clone)
-        
+getMostPopularFilmes();
+  
+  async function getMostPopularFilmes() {
+    const apiKey = await getApiKey();
+    const headerGet = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        Authorization: apiKey
+      }
+    };
+  
+    try {
+      const response = await fetch('https://api.themoviedb.org/3/movie/popular?language=en-US&page=1', headerGet);
+      const data = await response.json();
+      filmes = data.results.map(item => new Filme(item));
+      showContent(filmes);
+    } catch (err) {
+      console.error(err);
     }
+  }
+  
+  function showContent(lista) {
+    const template = document.getElementsByTagName("template")[0];
 
-}
+    clearElement(document.getElementById("card-template"));
 
-var checkbox = document.querySelector("input[name=favoritos]");
-var inputPesquisa = document.querySelector("input[name=pesquisa]");
-
-checkbox.addEventListener( 'change', function() {
-    clearElement(document.getElementById("card-template"))
-    if(this.checked) {
-        let filmesFiltrados = filmes.filter( filme => filme.favorito)
-        showContent(filmesFiltrados)
-    } else {
-        showContent(filmes)
-        // Checkbox não está selecionado.
+    for (const filme of lista) {
+      const clone = template.content.cloneNode(true);
+      const img = clone.getElementById("imagem-filme");
+      img.src = "https://image.tmdb.org/t/p/w500" + filme.poster_path;
+  
+      const filmName = clone.getElementById("nome-filme");
+      filmName.textContent = filme.title;
+  
+      const filmDescription = clone.getElementById("descricao-filme");
+      filmDescription.textContent = filme.overview;
+  
+      const nota = clone.getElementById("nota");
+      nota.textContent = filme.vote_average;
+  
+      const elementFavorito = clone.getElementById("div-favorito");
+      if (filme.favorito) {
+        elementFavorito.classList.add("fa-heart");
+        elementFavorito.classList.add("fa");
+      } else {
+        elementFavorito.classList.add("fa-heart-o");
+        elementFavorito.classList.add("fa");
+      }
+  
+      document.getElementById('card-template').appendChild(clone);
     }
-});
-
-inputPesquisa.addEventListener('input', function () {
-    clearElement(document.getElementById("card-template"))
-    if(this.value === "" || this.value === null){
-        showContent(filmes)
-    }else{
-        filmesFiltrados = filmes.filter((filme) => filme.title.toLowerCase().includes(this.value.toLowerCase()) )
-        showContent(filmesFiltrados)
-    }
-
-})
-
-function clearElement(element) {
+  }
+  
+  function clearElement(element) {
     while (element.hasChildNodes()) {
-        element.removeChild(element.firstChild)
+      element.removeChild(element.firstChild);
     }
-}
+  }
+  
+  document.querySelector("input[name=favoritos]").addEventListener('change', function() {
+    clearElement(document.getElementById("card-template"));
+  
+    if (this.checked) {
+      const filmesFiltrados = filmes.filter(filme => filme.favorito);
+      showContent(filmesFiltrados);
+    } else {
+      showContent(filmes);
+    }
+  });
+  
+  let inputPesquisa = document.querySelector("input[name=pesquisa]");
 
-async function getMostPopularFilmes() {
+  inputPesquisa.addEventListener('keydown', function(event) {
+    if (event.keyCode === 13 && this.value !== '') {
+      search();
+    }else if (this.value === '') {
+        getMostPopularFilmes()
+    }
+  });
+  
+  async function search() {
+    const apiKey = await getApiKey();
 
-    const options = {
-        method: 'GET',
-        headers: {
-          accept: 'application/json',
-          Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyNTk1MDM5ZmE2MzcxYmQzMDBmMzFlOTE5ZTkxYTJiNCIsInN1YiI6IjY0Y2E3NDBjMDAxYmJkMDEwNzk5ZWZlYyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.JZ5FaLaqoWZ5t9_0DQcnQpYaje8synfIsJnYfJFIkaE'
-        }
-      };
-   await fetch('https://api.themoviedb.org/3/movie/popular?language=en-US&page=1', options)
-    .then(response => response.json())
-    .then(response => {
-        showContent(response.results)
-        filmes = response.results
-    })
-    .catch(err => console.error(err));
-}
+    const headerGet = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        Authorization: apiKey
+      }
+    };
+  
+    const response = await fetch(`https://api.themoviedb.org/3/search/movie?query=${inputPesquisa.value}`, headerGet);
+    const data = await response.json();
+    filmes = data.results.map(item => new Filme(item));
+    showContent(filmes);
+  }
+  
