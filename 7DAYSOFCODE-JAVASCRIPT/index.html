@@ -6,48 +6,25 @@
     <title>Filmes</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 </head>
 <body>
-    
     <div class="container-titulo">
-        <div >
-            <div >
+            <div>
                 <h1>Filmes Populares</h1>
             </div>
             <div class="input-container">
                 <input class="input-pesquisa" type="text" name="pesquisa" id="pesquisa" placeholder="Digite algum filme para pesquisar...">
                 <button class="fa fa-search button-pesquisa" id="search" onclick="search()"></button>
             </div>
-            <div>
+            <div class="checkbox-favoritos">
                 <input onchange="onCheck($event)" type="checkbox" name="favoritos" id="favoritos">Mostras somente meus favoritos
             </div>
-        </div>
         
     </div>
-    <div class="container-card">
-        <div id="card-template"></div>
-    </div>
+    
+    <div class="movies"></div>
 
-    <template>
-        <div id="geral">
-            <div>
-                <img id="imagem-filme" src="" alt="" srcset="">
-            </div>
-            <div class="container-nome-estrela-favorito">
-                <div class="container-nome-filme">
-                    <span id="nome-filme"></span>
-                </div>
-                <div class="container-estrela-favorito" >
-                    <div class="fa fa-star" id="nota"></div>
-                    <div id="div-favorito">Favorito</div>
-                </div>
-            </div>
-            <div class="container-descricao-filme">
-                <span id="descricao-filme"></span>
-            </div>
-        </div>
-    </template>
+    <script type="module" src="script.js"></script>
 </body>
-<script src="script.js"></script>
-
 </html>

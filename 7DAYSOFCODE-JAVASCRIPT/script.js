@@ -1,3 +1,5 @@
+import {apikey} from "./environment/apikey.js"
+
 class Filme {
     constructor(data) {
       this.adult = data.adult;
@@ -16,108 +18,161 @@ class Filme {
       this.favorito = false; // Default value for the 'favorito' property
     }
   }
+  const moviesContainer = document.querySelector('.movies')
   
-  let filmes = [];
-  
-  async function getApiKey() {
-    const response = await fetch("apikey.txt");
-    return await response.text();
-}
-getMostPopularFilmes();
-  
+  getFilmes();
+  saveFavoritedMovies(Array.from([]))
+
+  async function getFilmes () {
+    clearMovieContainer()
+    const movies = await getMostPopularFilmes();
+    movies.forEach(movie => renderMovie(movie));
+  }
+
   async function getMostPopularFilmes() {
-    const apiKey = await getApiKey();
-    const headerGet = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: apiKey
-      }
-    };
-  
-    try {
-      const response = await fetch('https://api.themoviedb.org/3/movie/popular?language=en-US&page=1', headerGet);
-      const data = await response.json();
-      filmes = data.results.map(item => new Filme(item));
-      showContent(filmes);
-    } catch (err) {
-      console.error(err);
-    }
+    const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apikey}&language=en-US&page=1`;
+    const fetchResponse = await fetch(url)
+    const { results } = await fetchResponse.json();
+    return results;
   }
-  
-  function showContent(lista) {
-    const template = document.getElementsByTagName("template")[0];
 
-    clearElement(document.getElementById("card-template"));
-
-    for (const filme of lista) {
-      const clone = template.content.cloneNode(true);
-      const img = clone.getElementById("imagem-filme");
-      img.src = "https://image.tmdb.org/t/p/w500" + filme.poster_path;
-  
-      const filmName = clone.getElementById("nome-filme");
-      filmName.textContent = filme.title;
-  
-      const filmDescription = clone.getElementById("descricao-filme");
-      filmDescription.textContent = filme.overview;
-  
-      const nota = clone.getElementById("nota");
-      nota.textContent = filme.vote_average;
-  
-      const elementFavorito = clone.getElementById("div-favorito");
-      if (filme.favorito) {
-        elementFavorito.classList.add("fa-heart");
-        elementFavorito.classList.add("fa");
-      } else {
-        elementFavorito.classList.add("fa-heart-o");
-        elementFavorito.classList.add("fa");
-      }
-  
-      document.getElementById('card-template').appendChild(clone);
-    }
-  }
-  
-  function clearElement(element) {
-    while (element.hasChildNodes()) {
-      element.removeChild(element.firstChild);
-    }
-  }
-  
   document.querySelector("input[name=favoritos]").addEventListener('change', function() {
-    clearElement(document.getElementById("card-template"));
-  
+    clearMovieContainer()
     if (this.checked) {
-      const filmesFiltrados = filmes.filter(filme => filme.favorito);
-      showContent(filmesFiltrados);
+      getFavoriteMovies().forEach(movie => renderMovie(movie))
     } else {
-      showContent(filmes);
+      getFilmes()
     }
   });
-  
-  let inputPesquisa = document.querySelector("input[name=pesquisa]");
 
-  inputPesquisa.addEventListener('keydown', function(event) {
+  function renderMovie(movie) {
+
+    const { title, poster_path, vote_average, release_date, overview } = movie
+    let isFavorited = checkIsFavorited(movie);
+    movie.isFavorited = isFavorited;
+    const movieElement = document.createElement('div')
+    movieElement.classList.add('movie')
+    moviesContainer.appendChild(movieElement);
+    
+
+    const movieInformations = document.createElement('div')
+    movieInformations.classList.add('movie-informations')
+
+    const movieImageContainer = document.createElement('div')
+    movieImageContainer.classList.add('movie-image')
+    const movieImage = document.createElement('img')
+    movieImage.src = 'https://image.tmdb.org/t/p/w500' + poster_path;
+
+    movieImage.atr = `${title} Poster`
+    movieImageContainer.appendChild(movieImage)
+    movieInformations.appendChild(movieImageContainer)
+
+    const movieTextContainer = document.createElement('div')
+    movieTextContainer.classList.add('movie-text')
+    const movieTitle = document.createElement('h4')
+    movieTitle.textContent = `${title} (${release_date.split('-',1)})`
+    movieTextContainer.appendChild(movieTitle)
+    movieInformations.appendChild(movieTextContainer)
+
+
+    const informations = document.createElement('div')
+    informations.classList.add('movie-informations')
+    movieTextContainer.appendChild(informations)
+
+    const ratingContainer = document.createElement('div')
+    ratingContainer.classList.add('rating')
+    const starImage = document.createElement('div')
+    starImage.classList.add('fa-star','fa')
+    const movieRate = document.createElement('span')
+    movieRate.classList.add('movie-rate')
+    movieRate.textContent = vote_average
+    ratingContainer.appendChild(starImage)
+    ratingContainer.appendChild(movieRate)
+    informations.appendChild(ratingContainer)
+    
+    const favorite = document.createElement('button')
+    favorite.classList.add('favorite')
+    const favoriteImage = document.createElement('span')
+    favorite.classList.add('fa',isFavorited ? 'fa-heart' : 'fa-heart-o')
+    favoriteImage.classList.add("favoriteImage")
+
+    const favoriteText = document.createElement('span')
+    favoriteText.classList.add('movie-favorite')
+    favoriteText.textContent = 'Favoritar'
+    favorite.appendChild(favoriteImage)
+    favorite.appendChild(favoriteText)
+    informations.appendChild(favorite)
+
+    favorite.addEventListener('click', (event) => setFavoriteMovie(event,movie))
+
+    const movieDescriptionContainer = document.createElement('div')
+    movieDescriptionContainer.classList.add('movie-description')
+    const movieDescription = document.createElement('span')
+    movieDescription.textContent = overview
+    movieDescriptionContainer.appendChild(movieDescription)
+
+    movieElement.appendChild(movieInformations)
+    movieElement.appendChild(movieDescriptionContainer)
+  }
+  let inputPesquisa = document.querySelector("input[name=pesquisa]");
+  inputPesquisa.addEventListener('keyup', function(event) {
     if (event.keyCode === 13 && this.value !== '') {
       search();
     }else if (this.value === '') {
-        getMostPopularFilmes()
+      getFilmes()
     }
   });
-  
-  async function search() {
-    const apiKey = await getApiKey();
 
-    const headerGet = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: apiKey
-      }
-    };
-  
-    const response = await fetch(`https://api.themoviedb.org/3/search/movie?query=${inputPesquisa.value}`, headerGet);
+  async function search() {
+    clearMovieContainer();
+    const url =  `https://api.themoviedb.org/3/search/movie?api_key=${apikey}&query=${inputPesquisa.value}`
+    const response = await fetch(url);
     const data = await response.json();
-    filmes = data.results.map(item => new Filme(item));
-    showContent(filmes);
+    data.results.forEach(movie => renderMovie(movie))
+  };
+
+
+   function clearMovieContainer(){
+    moviesContainer.innerHTML = '';
+   }
+
+   function setFavoriteMovie(event,movie) {
+    if(movie.isFavorited){
+      removeFavoriteLocalStorage(movie)
+    }else{
+      saveFavoriteLocalStorage(movie)
+    }
+
+  }
+
+  function saveFavoriteLocalStorage(movie){
+    movie.isFavorited = true
+    const movies = getFavoriteMovies()
+    movies.push(movie)
+    saveFavoritedMovies(movies)
   }
   
+  function removeFavoriteLocalStorage(movie){
+    movie.isFavorited = false
+    const movies = getFavoriteMovies()
+    movies.splice(movies.indexOf(movie),1)
+
+  }
+
+  function getFavoriteMovies() {
+    return JSON.parse(localStorage.getItem('moviesFavorited'))
+}
+
+function saveFavoritedMovies(movies) {
+  const moviesJSON = JSON.stringify(movies)
+  localStorage.setItem( 'moviesFavorited',moviesJSON)
+}
+
+function checkIsFavorited(movie) {
+  const movies = getFavoriteMovies()
+  if (movies.length == 0) {
+    return false;
+  }else{
+    return movies.find(result => movie.id === result.id)
+  }
+}
