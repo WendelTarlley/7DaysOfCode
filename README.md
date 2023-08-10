@@ -10,7 +10,7 @@ Repositório para que eu possa treinar e aprender novas tecnologias com os desaf
     - ## Day6: Remoção de Arrays
     - ## DAY7: Funções em Javascript
 
-- ##  <a href=“https://wendeltarlley.github.io/7DaysOfCode/7DAYSOFCODE-JAVASCRIPT/index.html“>7DaysOfCode JavaScript</a> 
+- ##  7DaysOfCode JavaScript link acesso: https://wendeltarlley.github.io/7DaysOfCode/7DAYSOFCODE-JAVASCRIPT/index.html
     - ## Day1: Criando Filmes de forma estática
     - ## Day2: Manipulação do DOM e criando os elementos de forma dinâmica
     - ## Day3: Consumindo a API
