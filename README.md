@@ -17,3 +17,4 @@ Repositório para que eu possa treinar e aprender novas tecnologias com os desaf
     - ## Day4: Buscando um filme através da barra de pesquisa
     - ## Day5: Favoritando/desfavoritando um filme e salvando no Local Storage
     - ## Day6: Mostrando apenas os filmes favoritos
+    - ## Day7: Deploy Github pages
